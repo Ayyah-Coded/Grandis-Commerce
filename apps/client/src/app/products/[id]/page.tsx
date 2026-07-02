@@ -1,24 +1,6 @@
 import ProductInteraction from "@/components/ProductInteraction";
-import { ProductType } from "@/types";
 import Image from "next/image";
 
-// TEMPORARY
-// const product: ProductType = {
-//   id: 1,
-//   name: "Adidas CoreFit T-Shirt",
-//   shortDescription:
-//     "Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.",
-//   description:
-//     "Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit. Lorem ipsum dolor sit amet consect adipisicing elit lorem ipsum dolor sit.",
-//   price: 59.9,
-//   sizes: ["xs", "s", "m", "l", "xl"],
-//   colors: ["gray", "purple", "green"],
-//   images: {
-//     gray: "/products/1g.png",
-//     purple: "/products/1p.png",
-//     green: "/products/1gr.png",
-//   },
-// };
 
 export const generateMetadata = async ({
   params,
@@ -26,21 +8,22 @@ export const generateMetadata = async ({
   params: { id: string };
 }) => {
   // TODO:get the product from db
-  // TEMPORARY
+  const { id } = params
+  const res = await fetch(`http://localhost:8000/products/${id}`)
+  const product = await res.json();
   return {
     title: product.name,
     describe: product.description,
   };
 };
 
-const ProductPage = async ({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ id: string }>;
-  searchParams: Promise<{ color: string; size: string }>;
+const ProductPage = async ({ params, searchParams}
+  : { params: Promise<{ id: string }>; searchParams: Promise<{ color: string; size: string }>;
 }) => {
   const { size, color } = await searchParams;
+
+   const res = await fetch('http://localhost:8000/products')
+  const product = await res.json();
 
   const selectedSize = size || (product.sizes[0] as string);
   const selectedColor = color || (product.colors[0] as string);
