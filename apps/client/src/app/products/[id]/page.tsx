@@ -1,33 +1,41 @@
 import ProductInteraction from "@/components/ProductInteraction";
 import Image from "next/image";
-import { notFound } from "next/navigation";
+import { ProductType } from "@repo/types";
 
 
-export const generateMetadata = async ({params}: {params: Promise<{ id: string }>}) => {
-  // TODO:get the product from db
-  const { id } = await params;
-  const res = await fetch(`${process.env.API_URL}/products/${id}`);
-  if (!res.ok) {
-    return { title: "Product not found" };
-  }
-  const product = await res.json();
+const fetchProduct = async (id: string) => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/products/${id}`
+  );
+  const data: ProductType = await res.json();
+  return data;
+};
+
+export const generateMetadata = async ({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) => {
+    const { id } = await params;
+
+  const product = await fetchProduct(id);
   return {
     title: product.name,
-    description: product.description,
+    describe: product.description,
   };
 };
 
-const ProductPage = async ({ params, searchParams}
-  : { params: Promise<{ id: string }>; searchParams: Promise<{ color: string; size: string }>;
+const ProductPage = async ({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ color: string; size: string }>;
 }) => {
-  const { id } = await params;
   const { size, color } = await searchParams;
+  const { id } = await params;
 
-  const res = await fetch(`${process.env.API_URL}/products/${id}`);
-  if (!res.ok) {
-    notFound();
-  }
-  const product = await res.json();
+  const product = await fetchProduct(id);
 
   const selectedSize = size || (product.sizes[0] as string);
   const selectedColor = color || (product.colors[0] as string);
@@ -36,7 +44,9 @@ const ProductPage = async ({ params, searchParams}
       {/* IMAGE */}
       <div className="w-full lg:w-5/12 relative aspect-2/3">
         <Image
-          src={product.images[selectedColor]}
+          src={
+            (product.images as Record<string, string>)?.[selectedColor] || ""
+          }
           alt={product.name}
           fill
           className="object-contain rounded-md"
@@ -47,12 +57,34 @@ const ProductPage = async ({ params, searchParams}
         <h1 className="text-2xl font-medium">{product.name}</h1>
         <p className="text-gray-500">{product.description}</p>
         <h2 className="text-2xl font-semibold">${product.price.toFixed(2)}</h2>
-        <ProductInteraction product={product} selectedSize={selectedSize} selectedColor={selectedColor} />
+        <ProductInteraction
+          product={product}
+          selectedSize={selectedSize}
+          selectedColor={selectedColor}
+        />
         {/* CARD INFO */}
         <div className="flex items-center gap-2 mt-4">
-          <Image src="/klarna.png" alt="klarna" width={50} height={25} className="rounded-md"/>
-          <Image src="/cards.png" alt="cards" width={50} height={25} className="rounded-md"/>
-          <Image src="/stripe.png" alt="stripe" width={50} height={25} className="rounded-md"/>
+          <Image
+            src="/klarna.png"
+            alt="klarna"
+            width={50}
+            height={25}
+            className="rounded-md"
+          />
+          <Image
+            src="/cards.png"
+            alt="cards"
+            width={50}
+            height={25}
+            className="rounded-md"
+          />
+          <Image
+            src="/stripe.png"
+            alt="stripe"
+            width={50}
+            height={25}
+            className="rounded-md"
+          />
         </div>
         <p className="text-gray-500 text-xs">
           By clicking Pay Now, you agree to our{" "}

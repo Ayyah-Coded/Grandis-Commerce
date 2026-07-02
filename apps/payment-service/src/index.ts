@@ -2,10 +2,12 @@ import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { clerkMiddleware } from "@hono/clerk-auth";
 import { cors } from "hono/cors";
+import sessionRoute from "./routes/session.route";
+import webhookRoute from "./routes/webhooks.route";
 
 const app = new Hono();
 app.use("*", clerkMiddleware());
-app.use("*", cors({ origin: ["http://localhost:3002"] }));
+app.use("*", cors({ origin: ["http://localhost:8002"] }));
 
 app.get("/health", (c) => {
   return c.json({
@@ -15,7 +17,8 @@ app.get("/health", (c) => {
   });
 });
 
-
+app.route("/sessions", sessionRoute);
+app.route("/webhooks", webhookRoute);
 
 const start = async () => {
   try {

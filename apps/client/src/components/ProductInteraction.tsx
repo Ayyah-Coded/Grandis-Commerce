@@ -1,17 +1,13 @@
 "use client";
 
 import useCartStore from "@/stores/cartStore";
-import { ProductType } from "@/types";
+import { ProductType } from "@repo/types";
 import { Minus, Plus, ShoppingCart } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-const ProductInteraction = ({
-  product,
-  selectedSize,
-  selectedColor,
-}: {
+const ProductInteraction = ({ product, selectedSize, selectedColor }: {
   product: ProductType;
   selectedSize: string;
   selectedColor: string;
