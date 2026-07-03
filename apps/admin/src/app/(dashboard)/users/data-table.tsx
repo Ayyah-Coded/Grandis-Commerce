@@ -46,10 +46,10 @@ export function DataTable<TData, TValue>({
       const token = await getToken();
       const selectedRows = table.getSelectedRowModel().rows;
 
-      Promise.all(
+      const results = Promise.all(
         selectedRows.map(async (row) => {
           const userId = (row.original as User).id;
-          return await fetch(
+          const res = await fetch(
             `${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/users/${userId}`,
             {
               method: "DELETE",
@@ -58,11 +58,17 @@ export function DataTable<TData, TValue>({
               },
             }
           );
+          if (!res.ok) {
+            throw new Error(`Failed to delete user ${userId}`)
+          }
+          return res;
         })
       );
+      return results;
     },
     onSuccess: () => {
       toast.success("User(s) deleted successfully");
+      setRowSelection({});
       router.refresh()
     },
     onError: (error) => {
@@ -76,7 +82,15 @@ export function DataTable<TData, TValue>({
         <div className="flex justify-end">
           <button
             className="flex items-center gap-2 bg-red-500 text-white px-2 py-1 text-sm rounded-md m-4 cursor-pointer"
-            onClick={() => mutation.mutate()}
+            onClick={() => {
+              if (
+                window.confirm(
+                  "Are you sure you want to delete the selected user(s)? This action cannot be undone."
+                )
+              ) {
+                mutation.mutate();
+              }
+            }}
             disabled={mutation.isPending}
           >
             <Trash2 className="w-4 h-4" />

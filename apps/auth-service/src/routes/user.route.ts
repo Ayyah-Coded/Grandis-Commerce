@@ -2,6 +2,8 @@ import { Router } from "express";
 import clerkClient from "../utils/clerk";
 import { producer } from "../utils/kafka";
 
+import { UserFormSchema } from "@repo/types";
+
 const router: Router = Router();
 
 router.get("/", async (req, res) => {
@@ -16,10 +18,10 @@ router.get("/:id", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  type CreateParams = Parameters<typeof clerkClient.users.createUser>[0];
-  const newUser: CreateParams = req.body;
-  const user = await clerkClient.users.createUser(newUser);
-  producer.send("user.created", {
+  
+  const parsed = UserFormSchema.parse(req.body);
+  const user = await clerkClient.users.createUser(parsed);
+  await producer.send("user.created", {
     value: {
       username: user.username,
       email: user.emailAddresses[0]?.emailAddress,

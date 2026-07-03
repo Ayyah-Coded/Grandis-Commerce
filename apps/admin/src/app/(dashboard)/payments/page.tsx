@@ -7,6 +7,12 @@ const getData = async (): Promise<OrderType[]> => {
   try {
     const { getToken } = await auth();
     const token = await getToken();
+
+    if (!token) {
+      console.error("Unable to fetch payments: missing auth token");
+      return [];
+    }
+
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_ORDER_SERVICE_URL}/orders`,
       {
@@ -15,6 +21,9 @@ const getData = async (): Promise<OrderType[]> => {
         },
       }
     );
+     if (!res.ok) {
+      throw new Error(`Failed to fetch orders: ${res.status}`);
+    }
     const data = await res.json();
     return data;
   } catch (err) {

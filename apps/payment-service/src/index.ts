@@ -11,7 +11,7 @@ import { runKafkaSubscriptions } from "./utils/subscriptions.js";
 
 const app = new Hono();
 app.use("*", clerkMiddleware());
-app.use("*", cors({ origin: ["http://localhost:8005"] }));
+app.use("*", cors({ origin: ["http://localhost:8005", "http://localhost:8006"] }));
 
 app.get("/health", (c) => {
   return c.json({

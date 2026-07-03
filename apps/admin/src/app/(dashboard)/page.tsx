@@ -15,7 +15,12 @@ const Homepage = async () => {
         Authorization: `Bearer ${token}`,
       },
     }
-  ).then((res) => res.json());
+  ).then((res) => {
+    if (!res.ok) {
+      throw new Error(`Failed to load order chart data: ${res.status}`);
+    }
+    return res.json();
+});
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-4 gap-4">
       <div className="bg-primary-foreground p-4 rounded-lg lg:col-span-2 xl:col-span-1 2xl:col-span-2">

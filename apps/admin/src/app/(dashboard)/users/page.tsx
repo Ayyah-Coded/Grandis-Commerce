@@ -14,14 +14,16 @@ const getData = async (): Promise<{ data: User[]; totalCount: number }> => {
         },
       }
     );
+    if (!res.ok) {
+      throw new Error(`Failed to fetch users: ${res.status}`);
+    }
     const data = await res.json();
     return data;
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return { data: [], totalCount: 0 };
   }
-};
-
+}; 
 const UsersPage = async () => {
   const res = await getData();
   return (

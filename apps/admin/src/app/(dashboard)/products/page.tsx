@@ -5,8 +5,12 @@ import { DataTable } from "./data-table";
 const getData = async (): Promise<ProductsType> => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/products`
+      `${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/products`,
+      { cache: "no-store" }
     );
+    if (!res.ok) {
+      throw new Error(`Failed to fetch products: ${res.status}`);
+    }
     const data = await res.json();
     return data;
   } catch (error) {
@@ -14,7 +18,6 @@ const getData = async (): Promise<ProductsType> => {
     return [];
   }
 };
-
 const ProductPage = async () => {
   const data = await getData();
   return (

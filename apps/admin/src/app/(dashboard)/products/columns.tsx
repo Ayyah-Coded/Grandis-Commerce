@@ -38,18 +38,23 @@ export const columns: ColumnDef<ProductType>[] = [
       const product = row.original;
       return (
         <div className="w-9 h-9 relative">
-          <Image
-            src={
+          {(() => {
+            const src =
               (product.images as Record<string, string>)?.[
-                product.colors[0] || ""
-              ] || ""
-            }
-            alt={product.name}
-            fill
-            className="rounded-full object-cover"
-          />
-        </div>
-      );
+                product.colors?.[0] ?? ""
+              ];
+            return src ? (
+              <Image
+                src={src}
+                alt={product.name}
+                fill
+                className="rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-9 h-9 rounded-full bg-muted" />
+            );
+          })()}
+        </div>      );
     },
   },
   {

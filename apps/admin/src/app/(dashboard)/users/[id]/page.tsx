@@ -22,6 +22,12 @@ const getData = async (id: string): Promise<User | null> => {
         },
       }
     );
+
+    if (!res.ok) {
+      console.error(`Failed to fetch user ${id}: ${res.status} ${res.statusText}`);
+      return null;
+    }
+
     const data = await res.json();
     return data;
   } catch (err) {
@@ -56,7 +62,9 @@ const SingleUserPage = async ({
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbPage>
-              {data?.firstName + " " + data?.lastName || data?.username || "-"}
+              {data?.firstName || data?.lastName 
+                ? `${data?.firstName ?? ""} ${data?.lastName ?? ""}`.trim() 
+                : data?.username || "-"}
             </BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
@@ -188,7 +196,7 @@ const SingleUserPage = async ({
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-bold">Role:</span>
-                <span>{String(data.publicMetadata?.role) || "user"}</span>
+                <span>{(data.publicMetadata?.role as string) || "user"}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-bold">Status:</span>

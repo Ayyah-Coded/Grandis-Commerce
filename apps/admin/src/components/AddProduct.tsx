@@ -23,7 +23,7 @@ const fetchCategories = async () => {
   );
 
   if (!res.ok) {
-    throw new Error("Failed to fetch categories!");
+    throw new Error(`Failed to fetch categories (${res.status})`);
   }
 
   return await res.json();
@@ -44,10 +44,15 @@ const AddProduct = () => {
     },
   });
 
-  const { data } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["categories"],
     queryFn: fetchCategories,
   });
+
+  const categoryErrorMessage =
+    error instanceof Error
+      ? error.message
+      : "Unable to load categories right now. Please refresh or try again later.";
 
   const { getToken } = useAuth();
 
@@ -158,35 +163,56 @@ const AddProduct = () => {
                     </FormItem>
                   )}
                 />
-                {data && (
-                  <FormField
-                    control={form.control}
-                    name="categorySlug"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Category</FormLabel>
-                        <FormControl>
+                <FormField
+                  control={form.control}
+                  name="categorySlug"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Category</FormLabel>
+                      <FormControl>
+                        {isLoading ? (
+                          <p className="text-sm text-muted-foreground">
+                            Loading categories...
+                          </p>
+                        ) : isError ? (
+                          <div className="space-y-2 rounded-md border border-red-200 bg-red-50 p-3">
+                            <p className="text-sm text-red-700">
+                              {categoryErrorMessage}
+                            </p>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => refetch()}
+                              className="h-8"
+                            >
+                              Try again
+                            </Button>
+                          </div>
+                        ) : (
                           <Select onValueChange={field.onChange} value={field.value}>
                             <SelectTrigger>
                               <SelectValue placeholder="Select a category" />
                             </SelectTrigger>
                             <SelectContent>
-                              {data.map((cat: CategoryType) => (
+                              {data?.map((cat: CategoryType) => (
                                 <SelectItem key={cat.id} value={cat.slug}>
                                   {cat.name}
                                 </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
-                        </FormControl>
-                        <FormDescription>
-                          Enter the category of the product.
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
+                        )}
+                      </FormControl>
+                      <FormDescription>
+                        {isError
+                          ? "Categories are temporarily unavailable. You can retry once the service is back."
+                          : "Enter the category of the product."}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name="sizes"
