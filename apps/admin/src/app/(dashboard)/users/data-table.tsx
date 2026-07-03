@@ -1,23 +1,8 @@
 "use client";
 
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  SortingState,
-  useReactTable,
-} from "@tanstack/react-table";
-
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, getSortedRowModel,
+  SortingState, useReactTable } from "@tanstack/react-table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DataTablePagination } from "@/components/TablePagination";
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
@@ -64,7 +49,7 @@ export function DataTable<TData, TValue>({
       Promise.all(
         selectedRows.map(async (row) => {
           const userId = (row.original as User).id;
-          const res = await fetch(
+          return await fetch(
             `${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/users/${userId}`,
             {
               method: "DELETE",

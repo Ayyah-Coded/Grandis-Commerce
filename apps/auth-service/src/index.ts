@@ -1,16 +1,14 @@
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import { clerkMiddleware } from "@clerk/express";
-
-import productRouter from "./routes/product.route";
-import categoryRouter from "./routes/category.route";
-
-import { consumer, producer } from "./utils/kafka.js";
+import { shouldBeAdmin } from "./middleware/authMiddleware.js";
+import userRoute from "./routes/user.route";
+import { producer } from "./utils/kafka.js";
 
 const app = express();
 app.use(
   cors({
-    origin: ["http://localhost:8005", "http://localhost:8006"],
+    origin: ["http://localhost:8006"],
     credentials: true,
   })
 );
@@ -25,9 +23,7 @@ app.get("/health", (req: Request, res: Response) => {
   });
 });
 
-
-app.use("/products", productRouter);
-app.use("/categories", categoryRouter);
+app.use("/users", shouldBeAdmin, userRoute);
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.log(err);
@@ -38,9 +34,9 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 
 const start = async () => {
   try {
-    Promise.all([await producer.connect(), await consumer.connect()]);
-    app.listen(8000, () => {
-      console.log("Product service is running on 8000");
+    await producer.connect();
+    app.listen(8007, () => {
+      console.log("Auth service is running on 8007");
     });
   } catch (error) {
     console.log(error);

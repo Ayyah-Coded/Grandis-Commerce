@@ -1,16 +1,16 @@
+import { Home, Inbox, Calendar, Search, Settings, User2, ChevronUp, Plus,
+  Shirt, User, ShoppingBasket } from "lucide-react";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupAction,
+  SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuBadge,
+  SidebarMenuButton, SidebarMenuItem, SidebarSeparator } from "./ui/sidebar";
 import Link from "next/link";
 import Image from "next/image";
-
-import { Home, Inbox, Calendar, Search, Settings, User2, ChevronUp, Plus, Shirt, ShoppingBasket} from "lucide-react";
-
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupAction, SidebarGroupContent,
-  SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem,
-   SidebarSeparator 
-} from "./ui/sidebar";
-  
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Sheet, SheetTrigger } from "./ui/sheet";
-
+import AddOrder from "./AddOrder";
+import AddUser from "./AddUser";
+import AddCategory from "./AddCategory";
+import AddProduct from "./AddProduct";
 
 const items = [
   {

@@ -6,20 +6,13 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
   DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 import { cn } from "@/lib/utils";
+import { OrderType } from "@repo/types";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 
-export type Payment = {
-  id: string;
-  amount: number;
-  fullName: string;
-  userId: string;
-  email: string;
-  status: "pending" | "processing" | "success" | "failed";
-};
 
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<OrderType>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -39,8 +32,8 @@ export const columns: ColumnDef<Payment>[] = [
     ),
   },
   {
-    accessorKey: "fullName",
-    header: "User",
+    accessorKey: "_id",
+    header: "ID",
   },
   {
     accessorKey: "email",
@@ -84,7 +77,7 @@ export const columns: ColumnDef<Payment>[] = [
       const formatted = new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: "USD",
-      }).format(amount);
+      }).format(amount / 100);
 
       return <div className="text-right font-medium">{formatted}</div>;
     },
@@ -105,9 +98,9 @@ export const columns: ColumnDef<Payment>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
+              onClick={() => navigator.clipboard.writeText(payment._id)}
             >
-              Copy payment ID
+              Copy Order ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
