@@ -26,8 +26,8 @@ app.route("/webhooks", webhookRoute);
 
 const start = async () => {
   try {
-    Promise.all([await producer.connect(), await consumer.connect()]);
-    await runKafkaSubscriptions()
+    await Promise.all([producer.connect(), consumer.connect()]);
+    await runKafkaSubscriptions();
     serve(
       {
         fetch: app.fetch,

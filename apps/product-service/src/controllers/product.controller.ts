@@ -67,31 +67,25 @@ export const getProducts = async (req: Request, res: Response) => {
 
   const orderBy = (() => {
     switch (sort) {
-      case "asc":
-        return { price: Prisma.SortOrder.asc };
-        break;
-      case "desc":
-        return { price: Prisma.SortOrder.desc };
-        break;
-      case "oldest":
-        return { createdAt: Prisma.SortOrder.asc };
-        break;
-      default:
-        return { createdAt: Prisma.SortOrder.desc };
-        break;
+      case "asc": return { price: Prisma.SortOrder.asc };
+      case "desc": return { price: Prisma.SortOrder.desc };
+      case "oldest": return { createdAt: Prisma.SortOrder.asc };
+      default: return { createdAt: Prisma.SortOrder.desc };
     }
   })();
 
+  const where: Prisma.ProductWhereInput = {};
+
+  if (category) {
+    where.category = { slug: category as string };
+  }
+
+  if (search) {
+    where.name = { contains: search as string, mode: "insensitive" };
+  }
+
   const products = await prisma.product.findMany({
-    where: {
-      category: {
-        slug: category as string,
-      },
-      name: {
-        contains: search as string,
-        mode: "insensitive",
-      },
-    },
+    where,
     orderBy,
     take: limit ? Number(limit) : undefined,
   });

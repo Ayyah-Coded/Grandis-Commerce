@@ -14,27 +14,39 @@ export const createConsumer = (kafka: Kafka, groupId: string) => {
       topicHandler: (message: any) => Promise<void>;
     }[]
   ) => {
-    await consumer.subscribe({
-      topics: topics.map((topic) => topic.topicName),
-      fromBeginning: true,
-    });
+    const topicNames = topics.map((topic) => topic.topicName);
 
-    await consumer.run({
-      eachMessage: async ({ topic, partition, message }) => {
-        try {
-          const topicConfig = topics.find((t) => t.topicName === topic);
-          if (topicConfig) {
-            const value = message.value?.toString();
+    for (let attempt = 1; attempt <= 5; attempt++) {
+      try {
+        await consumer.subscribe({
+          topics: topicNames,
+          fromBeginning: true,
+        });
 
-            if (value) {
-              await topicConfig.topicHandler(JSON.parse(value));
+        await consumer.run({
+          eachMessage: async ({ topic, message }) => {
+            try {
+              const topicConfig = topics.find((t) => t.topicName === topic);
+              if (topicConfig) {
+                const value = message.value?.toString();
+
+                if (value) {
+                  await topicConfig.topicHandler(JSON.parse(value));
+                }
+              }
+            } catch (error) {
+              console.log("Error processing message", error);
             }
-          }
-        } catch (error) {
-          console.log("Error processing message", error);
-        }
-      },
-    });
+          },
+        });
+
+        return;
+      } catch (error) {
+        console.log(`Kafka subscribe attempt ${attempt} failed:`, error);
+        if (attempt === 5) throw error;
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      }
+    }
   };
 
   const disconnect = async () => {
