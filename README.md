@@ -1,6 +1,6 @@
 # 🛒 Grandis-Store
 
-> A production-ready, full-stack e-commerce platform built with a modern microservices-inspired architecture, demonstrating scalable backend engineering, event-driven communication, secure payment processing, and enterprise-grade software design.
+> A production-ready, full-stack e-commerce platform built with a microservices-inspired architecture — demonstrating scalable backend engineering, event-driven communication, secure payment processing, and enterprise-grade software design.
 
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript)
 ![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=nextdotjs)
@@ -13,323 +13,109 @@
 
 ---
 
-# 📖 Project Overview
+## Table of Contents
 
-Grandis-Store is a modern **production-ready e-commerce platform** built with **TypeScript**, **Next.js**, **Node.js**, and a **microservices-inspired architecture** designed for scalability, maintainability, and high performance.
-
-Unlike traditional monolithic e-commerce applications, Grandis-Store separates business capabilities into independent backend services that communicate asynchronously through **Apache Kafka**, enabling loose coupling and improved system resilience.
-
-The project demonstrates industry-standard backend engineering practices including:
-
-- Microservices architecture
-- Event-driven communication
-- Secure authentication
-- Distributed data management
-- Payment processing with Stripe
-- Modular monorepo development
-- Shared packages for code reuse
-- Type-safe API communication
-
-The repository is organized as a **Turborepo monorepo**, allowing frontend applications, backend services, shared libraries, and database packages to evolve independently while sharing a unified development workflow.
-
-This project was built to showcase real-world software engineering principles commonly used in modern technology companies where scalability, maintainability, and developer productivity are critical.
-
----
-
-# ✨ Key Features
-
-## Customer Experience
-
-- User authentication with Clerk
-- Secure account management
-- Browse products by category
-- Product search and filtering
-- Product detail pages
-- Shopping cart management
-- Secure checkout process
-- Stripe payment integration
-- Order history
-- Email notifications
+1. [Overview](#overview)
+2. [Key Features](#key-features)
+3. [Architecture](#architecture)
+4. [Technology Stack](#technology-stack)
+5. [Monorepo Structure](#monorepo-structure)
+6. [Applications & Packages](#applications--packages)
+7. [Authentication](#authentication)
+8. [Order & Payment Flow](#order--payment-flow)
+9. [Event-Driven Communication (Kafka)](#event-driven-communication-kafka)
+10. [Database Design](#database-design)
+11. [API Overview](#api-overview)
+12. [Environment Variables](#environment-variables)
+13. [Getting Started](#getting-started)
+14. [Deployment](#deployment)
+15. [Security](#security)
+16. [Future Improvements](#future-improvements)
+17. [Screenshots](#screenshots)
+18. [Contributing](#contributing)
+19. [License & Author](#license--author)
 
 ---
 
-## Administrative Dashboard
+## Overview
 
-- Product management
-- Inventory management
-- Category management
-- Order management
-- Customer management
-- Sales monitoring
-- Dashboard analytics
-- Secure administrator access
+Grandis-Store separates business capabilities into independent backend services that communicate asynchronously through **Apache Kafka**, rather than the tightly coupled structure of a traditional monolithic e-commerce app. The repository is organized as a **Turborepo monorepo**, so frontend apps, backend services, and shared libraries evolve independently while sharing one development workflow.
 
----
+The project demonstrates:
 
-## Backend Engineering
-
-- Modular service-oriented architecture
-- Event-driven communication using Apache Kafka
-- Shared TypeScript packages
-- RESTful APIs
-- Secure authentication middleware
-- Database abstraction
-- Email service integration
-- Payment webhook handling
-- Environment-based configuration
-- Strong TypeScript typing throughout the project
+- Microservices-inspired backend architecture
+- Event-driven communication between services
+- Secure authentication (Clerk) and payment processing (Stripe)
+- Modular monorepo development with shared, type-safe packages
 
 ---
 
-## Developer Experience
+## Key Features
 
-- Turborepo monorepo
-- PNPM workspaces
-- Shared UI components
-- Shared TypeScript types
-- Reusable packages
-- ESLint configuration
-- Type-safe development
-- Hot reloading
-- Modular folder organization
+**Customer Experience**
+Authentication & account management (Clerk) · product browsing, search & filtering · shopping cart · secure Stripe checkout · order history · email notifications
 
----
+**Admin Dashboard**
+Product, inventory & category management · order management · customer management · sales & dashboard analytics · secured admin-only access
 
-# 🏗 Architecture Overview
+**Backend Engineering**
+Service-oriented architecture · event-driven communication via Kafka · shared TypeScript packages · RESTful APIs · auth middleware · payment webhook handling · environment-based configuration
 
-Grandis-Store follows a **service-oriented architecture** where responsibilities are separated into independent applications and reusable packages.
-
-The platform consists of multiple frontend clients communicating with backend services through REST APIs. Business events are published through Apache Kafka, allowing services to react asynchronously without creating tight dependencies.
-
-Core architectural principles include:
-
-- Separation of concerns
-- Domain-driven organization
-- Event-driven workflows
-- Shared internal packages
-- Loose coupling between services
-- Independent database modules
-- Centralized authentication
-- External payment processing
-- Scalable deployment model
-
-The repository is divided into three major layers:
-
-### Frontend Layer
-
-- Customer storefront
-- Administrative dashboard
+**Developer Experience**
+Turborepo + pnpm workspaces · shared UI components and TypeScript types · shared ESLint config · hot reloading · modular folder structure
 
 ---
 
-### Backend Layer
+## Architecture
 
-- Authentication
-- Product management
-- Order management
-- Payment processing
-- Email notifications
-
----
-
-### Shared Infrastructure
-
-- Kafka messaging
-- Shared UI
-- Shared TypeScript types
-- Database packages
-- Common utilities
-
----
-
-# 📐 System Design
-
-## High-Level Architecture
+Multiple frontend clients talk to backend services over REST. Business events (order placed, payment completed, etc.) are published to Kafka so services can react asynchronously without depending on one another directly.
 
 ```mermaid
 flowchart LR
 
 Customer --> Storefront
-
 Admin --> Dashboard
 
 Storefront --> ProductAPI
 Dashboard --> ProductAPI
-
 Storefront --> OrderAPI
 
 OrderAPI --> PaymentAPI
-
 PaymentAPI --> Stripe
 
 ProductAPI --> MongoDB
-
 OrderAPI --> MongoDB
 
 PaymentAPI --> Kafka
-
 Kafka --> EmailService
-
 Kafka --> OrderService
 ```
 
----
+**Core principles:** separation of concerns, domain-driven organization, event-driven workflows, loose coupling between services, independent database modules per domain, and centralized (but stateless) authentication.
 
-## Repository Structure
-
-```mermaid
-graph TD
-
-Repo
-
-Repo --> Apps
-Repo --> Services
-Repo --> Packages
-
-Apps --> Storefront
-Apps --> AdminDashboard
-
-Services --> ProductService
-Services --> OrderService
-Services --> PaymentService
-Services --> EmailService
-
-Packages --> UI
-Packages --> SharedTypes
-Packages --> Kafka
-Packages --> ProductDatabase
-Packages --> OrderDatabase
-```
+| Layer | Contains |
+|---|---|
+| **Frontend** | Customer storefront, admin dashboard |
+| **Backend** | Auth, product management, order management, payment processing, email notifications |
+| **Shared infrastructure** | Kafka messaging, shared UI, shared types, database packages, common utilities |
 
 ---
 
-## Event-Driven Workflow
+## Technology Stack
 
-```mermaid
-sequenceDiagram
-
-participant User
-
-participant Store
-
-participant Order Service
-
-participant Payment Service
-
-participant Stripe
-
-participant Kafka
-
-participant Email Service
-
-User->>Store: Checkout
-
-Store->>Order Service: Create Order
-
-Order Service->>Payment Service: Request Payment
-
-Payment Service->>Stripe: Create Payment Intent
-
-Stripe-->>Payment Service: Payment Successful
-
-Payment Service->>Kafka: Publish PaymentCompleted Event
-
-Kafka-->>Order Service: Update Order Status
-
-Kafka-->>Email Service: Send Confirmation Email
-```
+| Category | Technology |
+|---|---|
+| Frontend | Next.js, React, TypeScript, Tailwind CSS, Clerk |
+| Backend | Node.js, Express.js, Hono, TypeScript |
+| Databases | MongoDB, Prisma ORM, Mongoose |
+| Messaging | Apache Kafka (event streaming), REST (service communication) |
+| Payments | Stripe, Stripe Webhooks |
+| Email | Nodemailer |
+| Monorepo & Tooling | Turborepo, pnpm Workspaces, ESLint, Prettier |
 
 ---
 
-# 🛠 Technology Stack
-
-## Frontend
-
-| Technology   | Purpose         |
-| ------------ | --------------- |
-| Next.js      | React framework |
-| React        | User Interface  |
-| TypeScript   | Type Safety     |
-| Tailwind CSS | Styling         |
-| Clerk        | Authentication  |
-
----
-
-## Backend
-
-| Technology | Purpose                 |
-| ---------- | ----------------------- |
-| Node.js    | Runtime                 |
-| Express.js | REST APIs               |
-| Hono       | Lightweight API Service |
-| TypeScript | Type Safety             |
-
----
-
-## Databases
-
-| Technology | Purpose          |
-| ---------- | ---------------- |
-| MongoDB    | Primary Database |
-| Prisma ORM | Database Access  |
-| Mongoose   | MongoDB ODM      |
-
----
-
-## Messaging & Communication
-
-| Technology   | Purpose               |
-| ------------ | --------------------- |
-| Apache Kafka | Event Streaming       |
-| REST API     | Service Communication |
-
----
-
-## Payment
-
-| Technology      | Purpose              |
-| --------------- | -------------------- |
-| Stripe          | Payment Processing   |
-| Stripe Webhooks | Payment Confirmation |
-
----
-
-## Email
-
-| Technology | Purpose              |
-| ---------- | -------------------- |
-| Nodemailer | Transactional Emails |
-
----
-
-## Monorepo & Tooling
-
-| Technology      | Purpose             |
-| --------------- | ------------------- |
-| Turborepo       | Monorepo Management |
-| PNPM Workspaces | Package Management  |
-| ESLint          | Code Quality        |
-| Prettier        | Code Formatting     |
-
----
-
-## Development Practices
-
-- **Type-safe development** using TypeScript
-- **Reusable packages** across applications
-- **Shared business logic**
-- **Strong modularization**
-- **Monorepo architecture**
-- **Event-driven communication**
-- **Secure authentication**
-- **Scalable project structure**
-- **Production-ready deployment strategy**
-
-# 📁 Monorepo Structure
-
-Grandis-Store is organized as a **Turborepo monorepo**, allowing multiple applications and shared packages to coexist in a single repository while maintaining clear separation of concerns.
-
-This architecture improves code reuse, enforces consistency across services, and simplifies dependency management for both frontend and backend applications.
+## Monorepo Structure
 
 ```
 grandis-store/
@@ -355,629 +141,193 @@ grandis-store/
 └── pnpm-workspace.yaml
 ```
 
-### Why a Monorepo?
-
-The monorepo approach offers several advantages:
-
-- Centralized dependency management
-- Shared TypeScript types across services
-- Reusable UI components
-- Consistent linting and formatting
-- Independent application deployment
-- Faster local development
-- Simplified CI/CD pipelines
-
-Each application remains independently deployable while benefiting from shared internal packages.
+**Why a monorepo?** Centralized dependency management, shared types and UI components across apps, consistent linting, and simplified CI/CD — while every application stays independently deployable.
 
 ---
 
-# 📦 Applications & Packages
+## Applications & Packages
 
-Grandis-Store is composed of independent applications responsible for specific business domains, alongside reusable packages that eliminate code duplication.
+### Storefront
+Customer-facing app: browse, search/filter, cart management, checkout, order history, profile management.
 
-## Applications
+### Admin Dashboard
+Product, inventory, and category administration; order monitoring; customer management; business analytics.
 
-### 🛍 Storefront
+### Product Service
+Product CRUD, inventory management, categorization, search support, and validation. Isolated from order/payment logic so the product domain can evolve independently — e.g. full-text search, recommendations, or multi-vendor support later.
 
-The customer-facing application where users can:
+### Order Service
+Order creation, validation, status updates, purchase history, and inventory synchronization.
 
-- Browse products
-- Search and filter inventory
-- Manage shopping cart
-- Complete purchases
-- View previous orders
-- Manage their profile
+### Payment Service
+Stripe Payment Intent creation, webhook verification, payment confirmation, and event publication.
 
----
+### Email Service
+Transactional email: order confirmations, payment receipts, account notifications.
 
-### 🛠 Admin Dashboard
+### Shared Packages
 
-A dedicated administration portal for managing the platform.
-
-Responsibilities include:
-
-- Product management
-- Inventory updates
-- Category administration
-- Order monitoring
-- Customer management
-- Business analytics
+| Package | Purpose |
+|---|---|
+| `ui` | Shared components — buttons, forms, cards, inputs, tables, layout |
+| `types` | Shared interfaces — Product, Order, User, Payment, API responses, Kafka events |
+| `kafka` | Reusable producers, consumers, topics, and event utilities |
+| `product-db` / `order-db` | Encapsulated persistence layer — connection, models, repositories, validation |
 
 ---
 
-### 📦 Product Service
+## Authentication
 
-Responsible for all product-related operations.
-
-Core responsibilities:
-
-- Product CRUD
-- Inventory management
-- Product categorization
-- Search support
-- Product validation
-
----
-
-### 📄 Order Service
-
-Handles the complete order lifecycle.
-
-Responsibilities include:
-
-- Order creation
-- Order validation
-- Status updates
-- Purchase history
-- Inventory synchronization
-
----
-
-### 💳 Payment Service
-
-A dedicated payment processing service integrated with Stripe.
-
-Responsibilities:
-
-- Payment Intent creation
-- Secure payment processing
-- Webhook verification
-- Payment confirmation
-- Event publishing
-
----
-
-### 📧 Email Service
-
-Handles transactional email communication.
-
-Examples include:
-
-- Order confirmation
-- Payment receipts
-- Account notifications
-- Purchase updates
-
----
-
-## Shared Packages
-
-To reduce duplication and improve maintainability, Grandis uses internal shared packages.
-
-### 🎨 UI Package
-
-Reusable UI components shared between frontend applications.
-
-Examples:
-
-- Buttons
-- Forms
-- Cards
-- Inputs
-- Tables
-- Layout components
-
----
-
-### 🧩 Shared Types
-
-Provides common TypeScript interfaces used across applications.
-
-Examples:
-
-- Product
-- Order
-- User
-- Payment
-- API responses
-- Kafka events
-
----
-
-### 📡 Kafka Package
-
-Contains reusable Kafka producers, consumers, topics, and event utilities used throughout backend services.
-
----
-
-### 🗄 Database Packages
-
-Database access is encapsulated into dedicated packages.
-
-Benefits include:
-
-- Separation of persistence logic
-- Reusable models
-- Easier testing
-- Centralized database configuration
-
----
-
-# 🔐 Authentication Flow
-
-Grandis-Store uses **Clerk Authentication** to provide secure and scalable identity management.
-
-Authentication responsibilities are delegated to Clerk, allowing backend services to remain stateless while trusting verified JWTs.
-
-## Authentication Workflow
+Grandis-Store delegates identity management to **Clerk**, keeping backend services stateless: each service independently verifies incoming JWTs without sharing session state.
 
 ```mermaid
 sequenceDiagram
-
 participant User
 participant Storefront
 participant Clerk
 participant Backend
 
 User->>Storefront: Sign In
-
 Storefront->>Clerk: Authentication Request
-
 Clerk-->>Storefront: JWT Access Token
-
 Storefront->>Backend: Protected API Request
-
 Backend->>Backend: Verify JWT
-
 Backend-->>Storefront: Authorized Response
 ```
 
-### Security Features
-
-- JWT-based authentication
-- Secure session management
-- Protected API routes
-- Middleware authorization
-- Token verification
-- Role-based access control (where applicable)
-- HTTPS-ready deployment
-
-Because authentication is centralized, every backend service can independently validate incoming tokens without sharing session state.
+Security features: JWT-based auth, secure session management, protected/middleware-guarded routes, role-based access where applicable, HTTPS-ready deployment.
 
 ---
 
-# 🛍 Product Management
+## Order & Payment Flow
 
-Product management is isolated into its own backend service, allowing inventory operations to evolve independently from order processing or payments.
-
-## Product Lifecycle
-
-```mermaid
-flowchart LR
-
-Admin --> CreateProduct
-
-CreateProduct --> Database
-
-Database --> Storefront
-
-Admin --> UpdateInventory
-
-UpdateInventory --> Database
-
-Database --> Customer
-```
-
-The Product Service provides functionality for:
-
-- Product creation
-- Product updates
-- Product deletion
-- Category management
-- Product search
-- Inventory tracking
-- Product validation
-
-Separating product management into its own domain improves scalability and simplifies future enhancements such as:
-
-- Full-text search
-- Product recommendations
-- Inventory forecasting
-- Multi-vendor support
-
----
-
-# 🛒 Shopping Cart & Checkout
-
-Grandis provides a streamlined shopping experience designed around simplicity and reliability.
-
-Customers can browse products, manage their cart, and securely complete purchases through Stripe.
-
-## Checkout Workflow
+Checkout, order creation, and payment are deliberately kept in separate services so payment processing never blocks or tangles with core business logic. Stripe **Payment Intents** handle card data directly, so sensitive payment information never touches Grandis's own servers.
 
 ```mermaid
 sequenceDiagram
-
 participant Customer
-
 participant Storefront
-
 participant Order Service
-
 participant Payment Service
-
 participant Stripe
+participant Kafka
+participant Email Service
 
-Customer->>Storefront: Add Product to Cart
-
-Customer->>Storefront: Proceed to Checkout
-
+Customer->>Storefront: Add to cart, proceed to checkout
 Storefront->>Order Service: Create Order
-
 Order Service->>Payment Service: Request Payment
-
 Payment Service->>Stripe: Create Payment Intent
-
-Stripe-->>Payment Service: Payment Successful
-
-Payment Service-->>Order Service: Confirm Payment
-
-Order Service-->>Storefront: Order Completed
-
+Stripe-->>Payment Service: Payment Successful (webhook)
+Payment Service->>Kafka: Publish PaymentCompleted
+Kafka-->>Order Service: Update Order Status
+Kafka-->>Email Service: Send Confirmation Email
 Storefront-->>Customer: Display Confirmation
 ```
 
-### Shopping Experience
+**Why webhooks, not client confirmation?** Trusting a signed Stripe webhook — rather than a "payment succeeded" message from the browser — prevents client-side manipulation and gives idempotent, fraud-resistant payment confirmation. Only a verified webhook event marks a payment as successful.
 
-Customers can:
+**Customer-facing checkout features:** cart management, order summary review, real-time order status, persistent order history, transactional email confirmation.
 
-- Browse available products
-- Search and filter inventory
-- Add products to their cart
-- Modify cart quantities
-- Remove unwanted items
-- Review order summary
-- Complete secure payment
-- Receive purchase confirmation
+---
 
-### Checkout Features
+## Event-Driven Communication (Kafka)
 
-- Secure Stripe payment integration
-- Order validation
-- Payment verification
-- Real-time order updates
-- Transactional email notifications
-- Persistent order history
-
-The checkout process is designed to keep payment processing isolated from business logic, improving maintainability and reducing coupling between services.
-
-# 💳 Payment Workflow
-
-Grandis integrates **Stripe** to provide secure, PCI-compliant payment processing without exposing sensitive payment information to backend services.
-
-Rather than processing card details directly, the Payment Service delegates payment authorization to Stripe using **Payment Intents**, ensuring a secure and industry-standard checkout experience.
-
-## Payment Architecture
+Instead of services calling each other directly, they publish domain events to Kafka topics that interested services consume independently.
 
 ```mermaid
 flowchart LR
-
-Customer --> Storefront
-
-Storefront --> OrderService
-
-OrderService --> PaymentService
-
-PaymentService --> Stripe
-
-Stripe --> PaymentWebhook
-
-PaymentWebhook --> PaymentService
-
-PaymentService --> Kafka
-
-Kafka --> OrderService
-
-Kafka --> EmailService
-```
-
----
-
-## Payment Flow
-
-1. Customer proceeds to checkout.
-2. The Storefront requests a new order.
-3. The Order Service validates the order.
-4. The Payment Service creates a Stripe Payment Intent.
-5. The client securely completes payment using Stripe.
-6. Stripe sends a signed webhook to the Payment Service.
-7. The Payment Service verifies the webhook signature.
-8. A `PaymentCompleted` event is published to Kafka.
-9. The Order Service updates the order status.
-10. The Email Service sends an order confirmation email.
-
----
-
-## Why Webhooks?
-
-Using webhooks instead of trusting the frontend ensures:
-
-- Payment authenticity
-- Fraud prevention
-- Reliable payment confirmation
-- Idempotent payment processing
-- Protection against client-side manipulation
-
-Only verified webhook events are considered successful payments.
-
----
-
-## Payment Features
-
-- Stripe Payment Intents
-- Secure checkout
-- Webhook verification
-- Payment confirmation
-- Event publication
-- Order synchronization
-- Transactional email notifications
-
----
-
-# 📡 Event-Driven Communication
-
-Grandis adopts an **event-driven architecture** using **Apache Kafka** to decouple backend services and improve scalability.
-
-Instead of tightly coupling services through direct API calls, business events are published to Kafka topics where interested services consume and react independently.
-
-This architecture improves resilience, maintainability, and horizontal scalability.
-
----
-
-## Event Flow
-
-```mermaid
-flowchart LR
-
 OrderService -->|OrderCreated| Kafka
-
 PaymentService -->|PaymentCompleted| Kafka
-
 Kafka --> OrderService
-
 Kafka --> EmailService
-
 Kafka --> InventoryService
 ```
 
----
+| Event | Purpose |
+|---|---|
+| `OrderCreated` | Customer places an order |
+| `PaymentCompleted` | Stripe payment succeeds |
+| `PaymentFailed` | Payment unsuccessful |
+| `InventoryUpdated` | Product stock changes |
+| `OrderCancelled` | Order cancellation |
+| `EmailRequested` | Trigger a transactional email |
 
-## Why Kafka?
-
-Using Apache Kafka provides several advantages:
-
-- Loose coupling between services
-- Reliable asynchronous communication
-- Horizontal scalability
-- Improved fault tolerance
-- Event replay capability
-- High throughput messaging
-- Independent service evolution
-
-Backend services no longer need to know about one another directly—they simply publish or consume events.
+**Why Kafka over direct API calls?** Loose coupling, reliable async delivery, horizontal scalability of consumers, event replay, and fault tolerance — services no longer need to know about each other, just the events they care about. The trade-off is added operational overhead (a broker to run) and eventual, rather than immediate, consistency.
 
 ---
 
-## Event Lifecycle
+## Database Design
 
-```mermaid
-sequenceDiagram
-
-participant Order Service
-
-participant Kafka
-
-participant Payment Service
-
-participant Email Service
-
-participant Inventory Service
-
-Order Service->>Kafka: OrderCreated
-
-Kafka-->>Payment Service: Consume Event
-
-Payment Service->>Kafka: PaymentCompleted
-
-Kafka-->>Inventory Service: Update Inventory
-
-Kafka-->>Email Service: Send Receipt
-
-Kafka-->>Order Service: Update Status
-```
-
----
-
-## Example Business Events
-
-| Event              | Purpose                     |
-| ------------------ | --------------------------- |
-| `OrderCreated`     | Customer places an order    |
-| `PaymentCompleted` | Stripe payment succeeds     |
-| `PaymentFailed`    | Payment unsuccessful        |
-| `InventoryUpdated` | Product stock changes       |
-| `OrderCancelled`   | Order cancellation          |
-| `EmailRequested`   | Trigger transactional email |
-
----
-
-# 🗄 Database Design
-
-Grandis follows a **modular persistence architecture**, separating database access into reusable packages while allowing services to manage their own business logic.
-
-This separation improves maintainability and encourages clean architecture principles.
-
----
-
-## Database Architecture
+Each domain owns its persistence logic through a dedicated database package, keeping business logic and data access cleanly separated.
 
 ```mermaid
 graph TD
-
 ProductService --> ProductDB
-
 OrderService --> OrderDB
-
 ProductDB --> MongoDB
-
 OrderDB --> MongoDB
 ```
 
----
+Each database package handles connection management, model definitions, repository operations, query abstraction, and validation — so backend services focus purely on business rules.
 
-## Persistence Strategy
-
-Database logic is isolated from application logic.
-
-Each database package is responsible for:
-
-- Database connection
-- Model definitions
-- Repository operations
-- Query abstraction
-- Validation
-
-This allows backend services to focus solely on business rules.
+| Technology | Responsibility |
+|---|---|
+| MongoDB | Primary document database |
+| Prisma ORM | Type-safe database access |
+| Mongoose | MongoDB schema modeling |
+| Shared DB packages | Encapsulated persistence layer per domain |
 
 ---
 
-## Technologies
+## API Overview
 
-| Technology               | Responsibility                 |
-| ------------------------ | ------------------------------ |
-| MongoDB                  | Primary document database      |
-| Prisma ORM               | Type-safe database access      |
-| Mongoose                 | MongoDB schema modeling        |
-| Shared Database Packages | Encapsulated persistence layer |
+Grandis exposes RESTful APIs organized by business domain — each service owns its resources and logic.
 
----
+| Service | Responsibility |
+|---|---|
+| Product Service | Product catalog & inventory |
+| Order Service | Order lifecycle management |
+| Payment Service | Stripe integration & payment verification |
+| Email Service | Transactional email delivery |
 
-## Design Principles
-
-- Separation of persistence and business logic
-- Reusable database modules
-- Type-safe queries
-- Schema validation
-- Centralized connection management
-- Independent evolution of data models
-
----
-
-# 🔌 API Overview
-
-Grandis exposes RESTful APIs organized around individual business domains.
-
-Each service owns its resources and encapsulates its own business logic.
-
----
-
-## Service Responsibilities
-
-| Service         | Responsibility                              |
-| --------------- | ------------------------------------------- |
-| Product Service | Product catalog and inventory               |
-| Order Service   | Order lifecycle management                  |
-| Payment Service | Stripe integration and payment verification |
-| Email Service   | Transactional email delivery                |
-
----
-
-## API Design Principles
-
-The APIs follow modern REST conventions:
-
-- Resource-oriented endpoints
-- JSON request/response payloads
-- Stateless communication
-- JWT authentication
-- Structured error handling
-- HTTP status code compliance
-
----
-
-## Typical Request Flow
+**Conventions:** resource-oriented endpoints, JSON payloads, stateless communication, JWT auth, structured error handling, standard HTTP status codes.
 
 ```mermaid
 sequenceDiagram
-
 participant Client
-
 participant API
-
 participant Service
-
 participant Database
 
 Client->>API: HTTP Request
-
 API->>Service: Validate Request
-
 Service->>Database: Query
-
 Database-->>Service: Result
-
 Service-->>Client: JSON Response
 ```
 
----
-
-## Common Response Structure
-
+**Standard response shape:**
 ```json
-{
-  "success": true,
-  "message": "Operation completed successfully.",
-  "data": {}
-}
+{ "success": true, "message": "Operation completed successfully.", "data": {} }
 ```
-
-Errors follow a consistent structure to simplify frontend error handling and debugging.
-
----
-
-# ⚙ Environment Variables
-
-Grandis uses environment-specific configuration to separate secrets from source code and support multiple deployment environments.
-
-Sensitive credentials are never committed to version control.
+Errors follow the same structure (`success: false`, `message`, `data`) for consistent frontend handling.
 
 ---
 
-## Storefront/Client
+## Environment Variables
 
+Each app/service keeps its own `.env`; secrets are never committed to source control.
+
+**Storefront**
 ```env
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
 CLERK_SECRET_KEY=
 NEXT_PUBLIC_PAYMENT_SERVICE_URL=
 NEXT_PUBLIC_ORDER_SERVICE_URL=
 NEXT_PUBLIC_PRODUCT_SERVICE_URL=
-
 ```
 
----
-
-## Admin Dashboard
-
+**Admin Dashboard**
 ```env
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
 CLERK_SECRET_KEY=
@@ -988,20 +338,14 @@ NEXT_PUBLIC_AUTH_SERVICE_URL=
 NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=
 ```
 
----
-
-## Product Service
-
+**Product Service**
 ```env
 PORT=
 CLERK_PUBLISHABLE_KEY=
 CLERK_SECRET_KEY=
 ```
 
----
-
-## Order Service
-
+**Order Service**
 ```env
 PORT=
 CLERK_PUBLISHABLE_KEY=
@@ -1009,23 +353,16 @@ CLERK_SECRET_KEY=
 MONGO_URL=
 ```
 
----
-
-## Payment Service
-
+**Payment Service**
 ```env
 PORT=
 STRIPE_SECRET_KEY=
 STRIPE_WEBHOOK_SECRET=
 CLERK_PUBLISHABLE_KEY=
 CLERK_SECRET_KEY=
-
 ```
 
----
-
-## Email Service
-
+**Email Service**
 ```env
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
@@ -1035,406 +372,125 @@ EMAIL_FROM=
 
 ---
 
-## Security Best Practices
+## Getting Started
 
-- Secrets stored in environment variables
-- `.env` files excluded from version control
-- Separate development and production configurations
-- Principle of least privilege for API keys
-- Server-side secret management in production
-- Secure webhook signature verification
+### Prerequisites
 
-# 🚀 Getting Started
+| Tool | Recommended Version |
+|---|---|
+| Node.js | 20+ |
+| pnpm | 10+ |
+| Git | Latest |
+| MongoDB | 7+ |
+| Apache Kafka | Latest stable |
+| Stripe CLI *(optional)* | Latest |
 
-Follow the steps below to set up Grandis for local development.
-
-## Prerequisites
-
-Ensure the following tools are installed before running the project:
-
-| Tool                    | Recommended Version |
-| ----------------------- | ------------------- |
-| Node.js                 | 20+                 |
-| PNPM                    | 10+                 |
-| Git                     | Latest              |
-| MongoDB                 | 7+                  |
-| Apache Kafka            | Latest Stable       |
-| Stripe CLI _(optional)_ | Latest              |
-
----
-
-## Clone the Repository
+### Setup
 
 ```bash
+# Clone and install
 git clone https://github.com/Ayyah-Coded/grandis-commerce.git
-
 cd grandis-store
-```
-
----
-
-## Install Dependencies
-
-```bash
 pnpm install
-```
 
----
+# Configure .env files for each app/service (see Environment Variables above)
 
-## Configure Environment Variables
-
-Create the required `.env` files for each application and service.
-
-Refer to the **Environment Variables** section above for the required configuration.
-
----
-
-## Start Development
-
-Run all applications concurrently using Turborepo:
-
-```bash
+# Run everything via Turborepo
 pnpm dev
-```
 
-Or start an individual application:
-
-```bash
+# ...or run a single app/service
 pnpm --filter storefront dev
-
 pnpm --filter admin dev
-
 pnpm --filter product-service dev
 ```
 
----
-
-## Build for Production
+### Common commands
 
 ```bash
-pnpm build
+pnpm build         # build everything
+pnpm lint          # lint the monorepo
+pnpm check-types   # type-check across packages
 ```
 
 ---
 
-## Run Linting
+## Deployment
 
-```bash
-pnpm lint
-```
-
----
-
-## Type Checking
-
-```bash
-pnpm check-types
-```
-
----
-
-# ☁ Deployment
-
-Grandis-Store has been designed with independent deployment in mind.
-
-Each frontend application and backend service can be deployed independently, enabling horizontal scalability and simplified infrastructure management.
-
-## Suggested Deployment Stack
-
-| Component        | Recommended Platform                |
-| ---------------- | ----------------------------------- |
-| Storefront       | Vercel                              |
-| Admin Dashboard  | Vercel                              |
-| Backend Services | Railway / Render / Fly.io / AWS ECS |
-| MongoDB          | MongoDB Atlas                       |
-| Kafka            | Confluent Cloud / Redpanda          |
-| Stripe           | Stripe Dashboard                    |
-| Email            | Gmail SMTP / SendGrid / Mailgun     |
-
----
-
-## Deployment Strategy
+Each frontend app and backend service deploys independently — updated, scaled, restarted, and monitored without affecting the rest of the platform.
 
 ```
-Frontend
-    ↓
-API Services
-    ↓
-Kafka
-    ↓
-Background Services
-    ↓
-MongoDB
+Frontend → API Services → Kafka → Background Services → MongoDB
 ```
 
-Each service can be independently:
+| Component | Recommended Platform |
+|---|---|
+| Storefront / Admin | Vercel |
+| Backend services | Railway / Render / Fly.io / AWS ECS |
+| MongoDB | MongoDB Atlas |
+| Kafka | Confluent Cloud / Redpanda |
+| Email | Gmail SMTP / SendGrid / Mailgun |
 
-- Updated
-- Scaled
-- Monitored
-- Restarted
-
-without affecting the rest of the platform.
-
----
-
-# ⚡ Performance Optimizations
-
-Grandis incorporates several architectural decisions aimed at improving scalability, responsiveness, and long-term maintainability.
-
-## Frontend Optimizations
-
-- Server-side rendering with Next.js
-- Optimized image loading
-- Lazy loading
-- Component reuse
-- Efficient routing
-- Type-safe API communication
+**Performance notes:** Next.js SSR, image and route lazy-loading on the frontend; independent service scaling and shared internal packages on the backend; Turborepo incremental builds and pnpm workspace caching in development.
 
 ---
 
-## Backend Optimizations
+## Security
 
-- Modular service architecture
-- Independent service deployment
-- Lightweight REST APIs
-- Asynchronous event processing
-- Shared internal packages
-- Reduced service coupling
+**Authentication:** Clerk-issued JWTs, verified independently by each service; protected routes; secure session handling.
 
----
+**Payments:** Stripe Payment Intents (no card data touches Grandis servers), signed webhook verification, PCI-compliant flow.
 
-## Database Optimizations
+**API:** input validation, auth middleware on protected routes, structured error handling.
 
-- Centralized connection management
-- Schema validation
-- Query abstraction
-- Modular persistence layer
+**Secrets:** environment variables only, `.env` excluded from version control, separate dev/production configs, least-privilege API keys.
 
 ---
 
-## Development Optimizations
+## Future Improvements
 
-- Turborepo incremental builds
-- PNPM workspace caching
-- Shared TypeScript configuration
-- Shared ESLint configuration
-- Reusable UI components
+**Commerce:** product reviews, wishlists, coupons & promotions, recommendations, multi-vendor marketplace, inventory reservations
 
----
+**Customer experience:** live chat, push notifications, recently viewed items, personalization, multi-language support
 
-# 🔒 Security
+**Engineering:** Redis caching, Docker Compose / Kubernetes, CI/CD pipelines, distributed tracing, centralized logging, Prometheus/Grafana monitoring, rate limiting, an API gateway, service discovery
 
-Security was considered throughout the architecture to ensure safe handling of user data and payment processing.
-
-## Authentication
-
-- Clerk Authentication
-- JWT verification
-- Protected routes
-- Secure session handling
+**Business:** analytics dashboard, sales reports, customer segmentation, marketing campaigns, refund management
 
 ---
 
-## Payments
+## Screenshots
 
-- Stripe Payment Intents
-- Webhook signature verification
-- PCI-compliant payment processing
-- No storage of card information
+> Coming soon — planned: home page, product listing & detail pages, cart, checkout, Stripe payment, order history, admin dashboard, product management, mobile layout.
 
 ---
 
-## API Security
+## Contributing
 
-- Input validation
-- Authentication middleware
-- Structured error handling
-- Environment-based configuration
+Contributions are welcome:
 
----
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push the branch
+5. Open a Pull Request
 
-## Secrets Management
-
-- Environment variables
-- No credentials committed to source control
-- Separate development and production configurations
+Please make sure your code follows the project's conventions and passes linting before submitting.
 
 ---
 
-# 🛣 Future Improvements
+## License & Author
 
-Although Grandis demonstrates a production-ready architecture, several enhancements could further extend the platform.
+**License:** MIT — free to use, modify, and distribute in accordance with the license terms.
 
-### Commerce
+**Author:** Yahaya Hayatullahi
+Backend & Full-Stack Software Engineer focused on scalable, distributed systems and modern web technologies.
 
-- Product reviews
-- Wishlist functionality
-- Coupons & promotions
-- Product recommendations
-- Multi-vendor marketplace
-- Inventory reservations
-
----
-
-### Customer Experience
-
-- Live chat support
-- Push notifications
-- Recently viewed products
-- Personalized recommendations
-- Multi-language support
-
----
-
-### Engineering
-
-- Redis caching
-- Docker Compose
-- Kubernetes deployment
-- CI/CD pipelines
-- Distributed tracing
-- Centralized logging
-- Monitoring with Prometheus & Grafana
-- Rate limiting
-- API Gateway
-- Service discovery
-
----
-
-### Business
-
-- Analytics dashboard
-- Sales reports
-- Customer segmentation
-- Marketing campaigns
-- Refund management
-
----
-
-# 🎯 Skills Demonstrated
-
-This project showcases practical experience with modern full-stack software engineering principles commonly used in production environments.
-
-## Backend Engineering
-
-- TypeScript
-- Node.js
-- Express.js
-- REST API Design
-- Authentication
-- Payment Integration
-- Event-Driven Architecture
-- Apache Kafka
-- MongoDB
-- Prisma ORM
-- Mongoose
-
----
-
-## Frontend Engineering
-
-- Next.js
-- React
-- Tailwind CSS
-- Clerk Authentication
-- Component Architecture
-
----
-
-## Software Architecture
-
-- Monorepo Development
-- Modular Design
-- Shared Packages
-- Separation of Concerns
-- Distributed Systems Concepts
-- Service-Oriented Architecture
-- Domain-Oriented Organization
-
----
-
-## DevOps & Tooling
-
-- Turborepo
-- PNPM Workspaces
-- Git
-- Environment Management
-- Production Deployment
-- Scalable Project Structure
-
----
-
-# 📸 Screenshots
-
-> Screenshots will be added soon.
-
-Suggested screenshots include:
-
-- Home Page
-- Product Listing
-- Product Details
-- Shopping Cart
-- Checkout
-- Stripe Payment
-- Order History
-- Admin Dashboard
-- Product Management
-- Mobile Responsive Layout
-
----
-
-# 🤝 Contributing
-
-Contributions are welcome!
-
-If you'd like to improve Grandis, feel free to:
-
-1. Fork the repository.
-2. Create a new feature branch.
-3. Commit your changes.
-4. Push the branch.
-5. Open a Pull Request.
-
-Please ensure all code follows the project's coding standards and passes linting before submitting.
-
----
-
-# 📄 License
-
-This project is licensed under the **MIT License**.
-
-You are free to use, modify, and distribute this software in accordance with the terms of the license.
-
----
-
-# 👨‍💻 Author
-
-**Yahaya Hayatullahi**
-
-Backend & Full-Stack Software Engineer passionate about building scalable, distributed systems with modern web technologies.
-
-### Connect with me
-
-- GitHub: https://github.com/Ayyah-Coded
-
+- GitHub: [https://github.com/Ayyah-Coded](https://github.com/Ayyah-Coded)
 <!-- - LinkedIn: https://linkedin.com/in/<your-profile> -->
 <!-- - Portfolio: https://<your-portfolio> -->
 
----
-
-## ⭐ Support
-
-If you found this project helpful or interesting:
-
-- ⭐ Star the repository
-- 🍴 Fork the project
-- 🐛 Report issues
-- 💡 Suggest new features
-- 🤝 Share it with others
-
-Your support helps improve the project and encourages future open-source development.
+If you find this project useful: ⭐ star it, 🍴 fork it, 🐛 report issues, or 💡 suggest features — it helps.
 
 ---
 
-> **Grandis-Store** was built as a showcase of modern software engineering practices, emphasizing scalability, maintainability, and clean architecture. It serves as both a production-ready e-commerce platform and a learning resource for developers exploring distributed systems, event-driven design, and full-stack application development.
+> **Grandis-Store** is a showcase of modern software engineering practice — scalable, maintainable, and clean by design — and a learning resource for developers exploring distributed systems, event-driven architecture, and full-stack development.
