@@ -1,0 +1,30 @@
+# Build from the MONOREPO ROOT:
+#   docker build -f apps/admin/Dockerfile -t grandis-admin .
+
+FROM node:22-slim AS base
+RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
+WORKDIR /app
+
+FROM base AS deps
+COPY . .
+RUN pnpm install --frozen-lockfile
+RUN pnpm --filter @repo/product-database exec prisma generate
+
+ARG NEXT_PUBLIC_PRODUCT_SERVICE_URL
+ARG NEXT_PUBLIC_ORDER_SERVICE_URL
+ARG NEXT_PUBLIC_AUTH_SERVICE_URL
+ARG NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+
+ENV NEXT_PUBLIC_PRODUCT_SERVICE_URL=$NEXT_PUBLIC_PRODUCT_SERVICE_URL \
+  NEXT_PUBLIC_ORDER_SERVICE_URL=$NEXT_PUBLIC_ORDER_SERVICE_URL \
+  NEXT_PUBLIC_AUTH_SERVICE_URL=$NEXT_PUBLIC_AUTH_SERVICE_URL \
+  NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=$NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME \
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY \
+  NODE_ENV=production
+
+RUN pnpm --filter admin run build
+
+EXPOSE 8006
+
+CMD ["pnpm", "--filter", "admin", "run", "start"]

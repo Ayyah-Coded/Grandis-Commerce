@@ -1,0 +1,309 @@
+name: grandis-commerce
+
+services:
+  # ─────────────────────────── Infrastructure ───────────────────────────
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: grandis-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-grandis}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - grandis-network
+
+  mongo:
+    image: mongo:7
+    container_name: grandis-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - grandis-network
+
+  kafka-broker-1:
+    image: apache/kafka:3.9.0
+    container_name: kafka-broker-1
+    restart: unless-stopped
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://0.0.0.0:9094
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker-1:9092,EXTERNAL://localhost:19094
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka-broker-1:9093,2@kafka-broker-2:9093,3@kafka-broker-3:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CLUSTER_ID: 7Dvn0OLMQo-bg4qmCmflVg
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    ports:
+      - "19094:9094"
+    volumes:
+      - kafka-1-data:/var/lib/kafka/data
+    networks:
+      - grandis-network
+
+  kafka-broker-2:
+    image: apache/kafka:3.9.0
+    container_name: kafka-broker-2
+    restart: unless-stopped
+    environment:
+      KAFKA_NODE_ID: 2
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://0.0.0.0:9095
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker-2:9092,EXTERNAL://localhost:19095
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka-broker-1:9093,2@kafka-broker-2:9093,3@kafka-broker-3:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CLUSTER_ID: 7Dvn0OLMQo-bg4qmCmflVg
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    ports:
+      - "19095:9095"
+    volumes:
+      - kafka-2-data:/var/lib/kafka/data
+    networks:
+      - grandis-network
+
+  kafka-broker-3:
+    image: apache/kafka:3.9.0
+    container_name: kafka-broker-3
+    restart: unless-stopped
+    environment:
+      KAFKA_NODE_ID: 3
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://0.0.0.0:9096
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker-3:9092,EXTERNAL://localhost:19096
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka-broker-1:9093,2@kafka-broker-2:9093,3@kafka-broker-3:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CLUSTER_ID: 7Dvn0OLMQo-bg4qmCmflVg
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    ports:
+      - "19096:9096"
+    volumes:
+      - kafka-3-data:/var/lib/kafka/data
+    networks:
+      - grandis-network
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    restart: unless-stopped
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local-cluster
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092
+      KAFKA_CLUSTERS_0_READONLY: "false"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - kafka-broker-1
+      - kafka-broker-2
+      - kafka-broker-3
+    networks:
+      - grandis-network
+
+  # ─────────────────────────── Backend services ───────────────────────────
+
+  product-service:
+    build:
+      context: .
+      dockerfile: apps/product-service/Dockerfile
+    container_name: product-service
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/grandis?schema=public}
+      KAFKA_BROKERS: kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092
+      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
+      NODE_ENV: production
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka-broker-1:
+        condition: service_started
+      kafka-broker-2:
+        condition: service_started
+      kafka-broker-3:
+        condition: service_started
+    networks:
+      - grandis-network
+
+  order-service:
+    build:
+      context: .
+      dockerfile: apps/order-service/Dockerfile
+    container_name: order-service
+    restart: unless-stopped
+    environment:
+      MONGO_URL: ${MONGO_URL:-mongodb://mongo:27017/grandis-orders}
+      KAFKA_BROKERS: kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092
+      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
+      NODE_ENV: production
+    ports:
+      - "8001:8001"
+    depends_on:
+      mongo:
+        condition: service_healthy
+      kafka-broker-1:
+        condition: service_started
+      kafka-broker-2:
+        condition: service_started
+      kafka-broker-3:
+        condition: service_started
+    networks:
+      - grandis-network
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: apps/payment-service/Dockerfile
+    container_name: payment-service
+    restart: unless-stopped
+    environment:
+      KAFKA_BROKERS: kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092
+      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      NODE_ENV: production
+    ports:
+      - "8002:8002"
+    depends_on:
+      kafka-broker-1:
+        condition: service_started
+      kafka-broker-2:
+        condition: service_started
+      kafka-broker-3:
+        condition: service_started
+    networks:
+      - grandis-network
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: apps/auth-service/Dockerfile
+    container_name: auth-service
+    restart: unless-stopped
+    environment:
+      KAFKA_BROKERS: kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092
+      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
+      NODE_ENV: production
+    ports:
+      - "8007:8007"
+    depends_on:
+      kafka-broker-1:
+        condition: service_started
+      kafka-broker-2:
+        condition: service_started
+      kafka-broker-3:
+        condition: service_started
+    networks:
+      - grandis-network
+
+  email-service:
+    build:
+      context: .
+      dockerfile: apps/email-service/Dockerfile
+    container_name: email-service
+    restart: unless-stopped
+    environment:
+      KAFKA_BROKERS: kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_REFRESH_TOKEN: ${GOOGLE_REFRESH_TOKEN}
+      EMAIL_FROM: ${EMAIL_FROM}
+      NODE_ENV: production
+    depends_on:
+      kafka-broker-1:
+        condition: service_started
+      kafka-broker-2:
+        condition: service_started
+      kafka-broker-3:
+        condition: service_started
+    networks:
+      - grandis-network
+
+  # ─────────────────────────── Frontend apps ───────────────────────────
+
+  client:
+    build:
+      context: .
+      dockerfile: apps/client/Dockerfile
+      args:
+        NEXT_PUBLIC_PRODUCT_SERVICE_URL: http://product-service:8000
+        NEXT_PUBLIC_ORDER_SERVICE_URL: http://order-service:8001
+        NEXT_PUBLIC_PAYMENT_SERVICE_URL: http://payment-service:8002
+        NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}
+        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+    container_name: client
+    restart: unless-stopped
+    environment:
+      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
+      NODE_ENV: production
+    ports:
+      - "8005:8005"
+    depends_on:
+      - product-service
+      - order-service
+      - payment-service
+    networks:
+      - grandis-network
+
+  admin:
+    build:
+      context: .
+      dockerfile: apps/admin/Dockerfile
+      args:
+        NEXT_PUBLIC_PRODUCT_SERVICE_URL: http://product-service:8000
+        NEXT_PUBLIC_ORDER_SERVICE_URL: http://order-service:8001
+        NEXT_PUBLIC_AUTH_SERVICE_URL: http://auth-service:8007
+        NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}
+        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+    container_name: admin
+    restart: unless-stopped
+    environment:
+      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
+      NODE_ENV: production
+    ports:
+      - "8006:8006"
+    depends_on:
+      - product-service
+      - order-service
+      - auth-service
+    networks:
+      - grandis-network
+
+networks:
+  grandis-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  mongo-data:
+  kafka-1-data:
+  kafka-2-data:
+  kafka-3-data:
