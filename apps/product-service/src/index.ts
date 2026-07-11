@@ -30,7 +30,7 @@ app.use("/products", productRouter);
 app.use("/categories", categoryRouter);
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  console.log(err);
+  console.dir(err, {depth: null});
   return res
     .status(err.status || 500)
     .json({ message: err.message || "Inter Server Error!" });

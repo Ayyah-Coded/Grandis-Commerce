@@ -1,0 +1,86 @@
+%%%%%%%%%%%% PRODUCT SERVICE %%%%%%%%%%%%%%%%%%%%
+
+@PRODUCT_SERVICE_URL = http://localhost:8000
+
+###
+GET {{PRODUCT_SERVICE_URL}}/health
+
+###
+GET {{ PRODUCT_SERVICE_URL }}/products
+
+###
+POST {{ PRODUCT_SERVICE_URL }}/createProduct
+
+###
+PUT {{ PRODUCT_SERVICE_URL }}/:id/updateProduct
+
+###
+DELETE {{ PRODUCT_SERVICE_URL }}/:id/deleteProduct
+
+###
+GET {{ PRODUCT_SERVICE_URL }}/getProducts
+
+###
+GET {{ PRODUCT_SERVICE_URL }}/:id/getProduct
+
+
+===================CATEGORIES==============================
+###
+GET {{ PRODUCT_SERVICE_URL }}/categories
+
+###
+POST {{ PRODUCT_SERVICE_URL }}/createCategory
+content-type: application/json
+
+{
+    "slug": "shoes",
+    "name": "Shoes"
+}
+
+###
+PUT {{ PRODUCT_SERVICE_URL }}/:id/updateCategory
+
+###
+DELETE {{ PRODUCT_SERVICE_URL }}/:id/deleteCategory
+
+###
+GET {{ PRODUCT_SERVICE_URL }}/getCategories
+
+
+
+
+%%%%%%%%%%%% ORDER SERVICE %%%%%%%%%%%%%%%%%%%%
+
+@ORDER_SERVICE_URL = http://localhost:8001
+
+GET {{ ORDER_SERVICE_URL }}/health
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%% PAYMENT SERVICE %%%%%%%%%%%%%%%%%%%%
+
+@PAYMENT_SERVICE_URL = http://localhost:8002
+
+GET {{ PAYMENT_SERVICE_URL }}/health
+
+
+
+
+
+
+
+%%%%%%%%%%%% CLIENT STOREFRONT %%%%%%%%%%%%%%%%%%%%
+
+###
+GET {{ PRODUCT_SERVICE_URL }}/test

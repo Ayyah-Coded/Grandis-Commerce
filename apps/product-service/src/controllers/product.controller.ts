@@ -8,17 +8,21 @@ import { producer } from "../utils/kafka";
 export const createProduct = async (req: Request, res: Response) => {
   const data: Prisma.ProductCreateInput = req.body;
 
+  if (!data) {
+    return res.status(400).json({ message: "Request body is missing or not valid JSON." });
+  }
+
   const { colors, images } = data;
 
-   if (!colors || !Array.isArray(colors) || colors.length === 0) {
+  if (!colors || !Array.isArray(colors) || colors.length === 0) {
     return res.status(400).json({ message: "Colors array is required!" });
   }
 
-  if (!images || typeof images !== "object" ) {
-    return res.status(400).json({  message: "Images object is required!" })
+  if (!images || typeof images !== "object") {
+    return res.status(400).json({ message: "Images object is required!" });
   }
 
-  const missingColors = colors.filter((color) => !(color in images))
+  const missingColors = colors.filter((color) => !(color in images));
 
   if (missingColors.length > 0) {
     return res.status(400).json({ message: "Missing images for colors!", missingColors });
@@ -32,9 +36,12 @@ export const createProduct = async (req: Request, res: Response) => {
     price: product.price,
   };
 
-  producer.send("product.created", { value: stripeProduct });
-  res.status(201).json(product);
-
+  try {
+    await producer.send("product.created", { value: stripeProduct });
+  } catch (err) {
+    console.error("Failed to publish product.created event:", err);
+  }
+  
   res.status(201).json(product);
 };
 
