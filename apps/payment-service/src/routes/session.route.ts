@@ -31,9 +31,9 @@ sessionRoute.post("/create-checkout-session", shouldBeUser, async (c) => {
       line_items: lineItems,
       client_reference_id: userId,
       mode: "payment",
-      ui_mode: "custom",
+      ui_mode: "embedded_page",
       return_url:
-        "http://localhost:8002/return?session_id={CHECKOUT_SESSION_ID}",
+        "http://localhost:8005/return?session_id={CHECKOUT_SESSION_ID}",
     });
 
     return c.json({ checkoutSessionClientSecret: session.client_secret });

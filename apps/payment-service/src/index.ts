@@ -10,6 +10,8 @@ import { consumer, producer } from "./utils/kafka.js";
 import { runKafkaSubscriptions } from "./utils/subscriptions.js";
 
 const app = new Hono();
+
+
 app.use("*", clerkMiddleware());
 app.use("*", cors({ origin: ["http://localhost:8005", "http://localhost:8006"] }));
 
