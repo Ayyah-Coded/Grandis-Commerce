@@ -106,7 +106,7 @@ Kafka --> OrderService
 | Category | Technology |
 |---|---|
 | Frontend | Next.js, React, TypeScript, Tailwind CSS, Clerk |
-| Backend | Node.js, Express.js, Hono, TypeScript |
+| Backend | Node.js, Express.js, Hono, Fastify, TypeScript |
 | Databases | MongoDB, Prisma ORM, Mongoose |
 | Messaging | Apache Kafka (event streaming), REST (service communication) |
 | Payments | Stripe, Stripe Webhooks |
@@ -129,7 +129,6 @@ grandis-store/
 │   └── email-service/         # Email Notification Service
 │
 ├── packages/
-│   ├── ui/                    # Shared UI Components
 │   ├── kafka/                 # Kafka Producers & Consumers
 │   ├── types/                 # Shared TypeScript Types
 │   ├── product-db/            # Product Database Layer
@@ -138,10 +137,11 @@ grandis-store/
 │
 ├── package.json
 ├── turbo.json
+├── docker-compose.yml
 └── pnpm-workspace.yaml
 ```
 
-**Why a monorepo?** Centralized dependency management, shared types and UI components across apps, consistent linting, and simplified CI/CD — while every application stays independently deployable.
+**Why a monorepo?** Centralized dependency management, shared types across apps, consistent linting, and simplified CI/CD — while every application stays independently deployable.
 
 ---
 
@@ -169,7 +169,6 @@ Transactional email: order confirmations, payment receipts, account notification
 
 | Package | Purpose |
 |---|---|
-| `ui` | Shared components — buttons, forms, cards, inputs, tables, layout |
 | `types` | Shared interfaces — Product, Order, User, Payment, API responses, Kafka events |
 | `kafka` | Reusable producers, consumers, topics, and event utilities |
 | `product-db` / `order-db` | Encapsulated persistence layer — connection, models, repositories, validation |
@@ -264,7 +263,7 @@ Each domain owns its persistence logic through a dedicated database package, kee
 graph TD
 ProductService --> ProductDB
 OrderService --> OrderDB
-ProductDB --> MongoDB
+ProductDB --> PostgresDB
 OrderDB --> MongoDB
 ```
 
@@ -396,20 +395,20 @@ pnpm install
 # Configure .env files for each app/service (see Environment Variables above)
 
 # Run everything via Turborepo
-pnpm dev
+turbo dev
 
 # ...or run a single app/service
-pnpm --filter storefront dev
-pnpm --filter admin dev
-pnpm --filter product-service dev
+turbo --filter storefront dev
+turbo --filter admin dev
+turbo --filter product-service dev
 ```
 
 ### Common commands
 
 ```bash
-pnpm build         # build everything
-pnpm lint          # lint the monorepo
-pnpm check-types   # type-check across packages
+turbo build         # build everything
+turbo lint          # lint the monorepo
+turbo check-types   # type-check across packages
 ```
 
 ---
