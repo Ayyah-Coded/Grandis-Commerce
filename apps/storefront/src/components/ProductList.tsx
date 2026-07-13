@@ -5,7 +5,7 @@ import Filter from "./Filter";
 
 import { ProductsType } from "@repo/types"
 
-// TEMPORARY
+
 const fetchData = async ({ category, sort, search, params}: {
   category?: string;
   sort?: string;

@@ -21,7 +21,7 @@ const Navbar = () => {
           className="w-6 h-6 md:w-9 md:h-9"
         />
         <p className="hidden md:block text-md font-medium tracking-wider">
-          AYYAH.DEV
+          AYYAH
         </p>
       </Link>
       {/* RIGHT */}

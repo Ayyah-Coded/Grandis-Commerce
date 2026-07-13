@@ -11,7 +11,7 @@ import useCartStore from "@/stores/cartStore";
 const stripe = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 const fetchClientSecret = async (cart: CartItemsType, token: string) => {
-  return fetch(
+  const response = await fetch(
     `${process.env.NEXT_PUBLIC_PAYMENT_SERVICE_URL}/sessions/create-checkout-session`,
     {
       method: "POST",
@@ -24,8 +24,13 @@ const fetchClientSecret = async (cart: CartItemsType, token: string) => {
       },
     }
   )
-    .then((response) => response.json())
-    .then((json) => json.checkoutSessionClientSecret);
+    const json = await response.json();
+
+    if (!json.checkoutSessionClientSecret) {
+      throw new Error(json.error?.message ?? "Failed to create checkout session");
+    }
+
+    return json.checkoutSessionClientSecret;
 };
 
 const StripePaymentForm = ({

@@ -93,25 +93,25 @@ Kafka --> OrderService
 
 **Core principles:** separation of concerns, domain-driven organization, event-driven workflows, loose coupling between services, independent database modules per domain, and centralized (but stateless) authentication.
 
-| Layer | Contains |
-|---|---|
-| **Frontend** | Customer storefront, admin dashboard |
-| **Backend** | Auth, product management, order management, payment processing, email notifications |
-| **Shared infrastructure** | Kafka messaging, shared UI, shared types, database packages, common utilities |
+| Layer                     | Contains                                                                            |
+| ------------------------- | ----------------------------------------------------------------------------------- |
+| **Frontend**              | Customer storefront, admin dashboard                                                |
+| **Backend**               | Auth, product management, order management, payment processing, email notifications |
+| **Shared infrastructure** | Kafka messaging, shared UI, shared types, database packages, common utilities       |
 
 ---
 
 ## Technology Stack
 
-| Category | Technology |
-|---|---|
-| Frontend | Next.js, React, TypeScript, Tailwind CSS, Clerk |
-| Backend | Node.js, Express.js, Hono, Fastify, TypeScript |
-| Databases | MongoDB, Prisma ORM, Mongoose |
-| Messaging | Apache Kafka (event streaming), REST (service communication) |
-| Payments | Stripe, Stripe Webhooks |
-| Email | Nodemailer |
-| Monorepo & Tooling | Turborepo, pnpm Workspaces, ESLint, Prettier |
+| Category           | Technology                                                   |
+| ------------------ | ------------------------------------------------------------ |
+| Frontend           | Next.js, React, TypeScript, Tailwind CSS, Clerk              |
+| Backend            | Node.js, Express.js, Hono, Fastify, TypeScript               |
+| Databases          | MongoDB, Prisma ORM, Mongoose                                |
+| Messaging          | Apache Kafka (event streaming), REST (service communication) |
+| Payments           | Stripe, Stripe Webhooks                                      |
+| Email              | Nodemailer                                                   |
+| Monorepo & Tooling | Turborepo, pnpm Workspaces, ESLint, Prettier                 |
 
 ---
 
@@ -148,30 +148,36 @@ grandis-store/
 ## Applications & Packages
 
 ### Storefront
+
 Customer-facing app: browse, search/filter, cart management, checkout, order history, profile management.
 
 ### Admin Dashboard
+
 Product, inventory, and category administration; order monitoring; customer management; business analytics.
 
 ### Product Service
+
 Product CRUD, inventory management, categorization, search support, and validation. Isolated from order/payment logic so the product domain can evolve independently — e.g. full-text search, recommendations, or multi-vendor support later.
 
 ### Order Service
+
 Order creation, validation, status updates, purchase history, and inventory synchronization.
 
 ### Payment Service
+
 Stripe Payment Intent creation, webhook verification, payment confirmation, and event publication.
 
 ### Email Service
+
 Transactional email: order confirmations, payment receipts, account notifications.
 
 ### Shared Packages
 
-| Package | Purpose |
-|---|---|
-| `types` | Shared interfaces — Product, Order, User, Payment, API responses, Kafka events |
-| `kafka` | Reusable producers, consumers, topics, and event utilities |
-| `product-db` / `order-db` | Encapsulated persistence layer — connection, models, repositories, validation |
+| Package                   | Purpose                                                                        |
+| ------------------------- | ------------------------------------------------------------------------------ |
+| `types`                   | Shared interfaces — Product, Order, User, Payment, API responses, Kafka events |
+| `kafka`                   | Reusable producers, consumers, topics, and event utilities                     |
+| `product-db` / `order-db` | Encapsulated persistence layer — connection, models, repositories, validation  |
 
 ---
 
@@ -242,14 +248,14 @@ Kafka --> EmailService
 Kafka --> InventoryService
 ```
 
-| Event | Purpose |
-|---|---|
-| `OrderCreated` | Customer places an order |
-| `PaymentCompleted` | Stripe payment succeeds |
-| `PaymentFailed` | Payment unsuccessful |
-| `InventoryUpdated` | Product stock changes |
-| `OrderCancelled` | Order cancellation |
-| `EmailRequested` | Trigger a transactional email |
+| Event              | Purpose                       |
+| ------------------ | ----------------------------- |
+| `OrderCreated`     | Customer places an order      |
+| `PaymentCompleted` | Stripe payment succeeds       |
+| `PaymentFailed`    | Payment unsuccessful          |
+| `InventoryUpdated` | Product stock changes         |
+| `OrderCancelled`   | Order cancellation            |
+| `EmailRequested`   | Trigger a transactional email |
 
 **Why Kafka over direct API calls?** Loose coupling, reliable async delivery, horizontal scalability of consumers, event replay, and fault tolerance — services no longer need to know about each other, just the events they care about. The trade-off is added operational overhead (a broker to run) and eventual, rather than immediate, consistency.
 
@@ -269,11 +275,11 @@ OrderDB --> MongoDB
 
 Each database package handles connection management, model definitions, repository operations, query abstraction, and validation — so backend services focus purely on business rules.
 
-| Technology | Responsibility |
-|---|---|
-| MongoDB | Primary document database |
-| Prisma ORM | Type-safe database access |
-| Mongoose | MongoDB schema modeling |
+| Technology         | Responsibility                            |
+| ------------------ | ----------------------------------------- |
+| MongoDB            | Primary document database                 |
+| Prisma ORM         | Type-safe database access                 |
+| Mongoose           | MongoDB schema modeling                   |
 | Shared DB packages | Encapsulated persistence layer per domain |
 
 ---
@@ -282,12 +288,12 @@ Each database package handles connection management, model definitions, reposito
 
 Grandis exposes RESTful APIs organized by business domain — each service owns its resources and logic.
 
-| Service | Responsibility |
-|---|---|
-| Product Service | Product catalog & inventory |
-| Order Service | Order lifecycle management |
+| Service         | Responsibility                            |
+| --------------- | ----------------------------------------- |
+| Product Service | Product catalog & inventory               |
+| Order Service   | Order lifecycle management                |
 | Payment Service | Stripe integration & payment verification |
-| Email Service | Transactional email delivery |
+| Email Service   | Transactional email delivery              |
 
 **Conventions:** resource-oriented endpoints, JSON payloads, stateless communication, JWT auth, structured error handling, standard HTTP status codes.
 
@@ -306,9 +312,11 @@ Service-->>Client: JSON Response
 ```
 
 **Standard response shape:**
+
 ```json
 { "success": true, "message": "Operation completed successfully.", "data": {} }
 ```
+
 Errors follow the same structure (`success: false`, `message`, `data`) for consistent frontend handling.
 
 ---
@@ -318,6 +326,7 @@ Errors follow the same structure (`success: false`, `message`, `data`) for consi
 Each app/service keeps its own `.env`; secrets are never committed to source control.
 
 **Storefront**
+
 ```env
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
 CLERK_SECRET_KEY=
@@ -327,6 +336,7 @@ NEXT_PUBLIC_PRODUCT_SERVICE_URL=
 ```
 
 **Admin Dashboard**
+
 ```env
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
 CLERK_SECRET_KEY=
@@ -338,6 +348,7 @@ NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=
 ```
 
 **Product Service**
+
 ```env
 PORT=
 CLERK_PUBLISHABLE_KEY=
@@ -345,6 +356,7 @@ CLERK_SECRET_KEY=
 ```
 
 **Order Service**
+
 ```env
 PORT=
 CLERK_PUBLISHABLE_KEY=
@@ -353,6 +365,7 @@ MONGO_URL=
 ```
 
 **Payment Service**
+
 ```env
 PORT=
 STRIPE_SECRET_KEY=
@@ -362,6 +375,7 @@ CLERK_SECRET_KEY=
 ```
 
 **Email Service**
+
 ```env
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
@@ -375,14 +389,14 @@ EMAIL_FROM=
 
 ### Prerequisites
 
-| Tool | Recommended Version |
-|---|---|
-| Node.js | 20+ |
-| pnpm | 10+ |
-| Git | Latest |
-| MongoDB | 7+ |
-| Apache Kafka | Latest stable |
-| Stripe CLI *(optional)* | Latest |
+| Tool                    | Recommended Version |
+| ----------------------- | ------------------- |
+| Node.js                 | 20+                 |
+| pnpm                    | 10+                 |
+| Git                     | Latest              |
+| MongoDB                 | 7+                  |
+| Apache Kafka            | Latest stable       |
+| Stripe CLI _(optional)_ | Latest              |
 
 ### Setup
 
@@ -421,13 +435,13 @@ Each frontend app and backend service deploys independently — updated, scaled,
 Frontend → API Services → Kafka → Background Services → MongoDB
 ```
 
-| Component | Recommended Platform |
-|---|---|
-| Storefront / Admin | Vercel |
-| Backend services | Railway / Render / Fly.io / AWS ECS |
-| MongoDB | MongoDB Atlas |
-| Kafka | Confluent Cloud / Redpanda |
-| Email | Gmail SMTP / SendGrid / Mailgun |
+| Component          | Recommended Platform                |
+| ------------------ | ----------------------------------- |
+| Storefront / Admin | Vercel                              |
+| Backend services   | Railway / Render / Fly.io / AWS ECS |
+| MongoDB            | MongoDB Atlas                       |
+| Kafka              | Confluent Cloud / Redpanda          |
+| Email              | Gmail SMTP / SendGrid / Mailgun     |
 
 **Performance notes:** Next.js SSR, image and route lazy-loading on the frontend; independent service scaling and shared internal packages on the backend; Turborepo incremental builds and pnpm workspace caching in development.
 
@@ -459,7 +473,13 @@ Frontend → API Services → Kafka → Background Services → MongoDB
 
 ## Screenshots
 
-> Coming soon — planned: home page, product listing & detail pages, cart, checkout, Stripe payment, order history, admin dashboard, product management, mobile layout.
+![Storefront home-page](./assets/screenshots/home-page.png)
+![Storefront detail-page](./assets/screenshots/detail-page.png)
+![Storefront cart](./assets/screenshots/cart.png)
+![Storefront checkout page](./assets/screenshots/stripe-payment.png)
+![Admin dashboard page](./assets/screenshots/dashboard.png)
+
+<!-- > Coming soon — planned: home page, product listing & detail pages, cart, checkout, Stripe payment, order history, admin dashboard, product management, mobile layout. -->
 
 ---
 
@@ -485,6 +505,7 @@ Please make sure your code follows the project's conventions and passes linting 
 Backend & Full-Stack Software Engineer focused on scalable, distributed systems and modern web technologies.
 
 - GitHub: [https://github.com/Ayyah-Coded](https://github.com/Ayyah-Coded)
+
 <!-- - LinkedIn: https://linkedin.com/in/<your-profile> -->
 <!-- - Portfolio: https://<your-portfolio> -->
 
