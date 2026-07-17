@@ -505,8 +505,7 @@ Please make sure your code follows the project's conventions and passes linting 
 Backend & Full-Stack Software Engineer focused on scalable, distributed systems and modern web technologies.
 
 - GitHub: [https://github.com/Ayyah-Coded](https://github.com/Ayyah-Coded)
-
-<!-- - LinkedIn: https://linkedin.com/in/<your-profile> -->
+- LinkedIn: https://linkedin.com/in/dev-ayyah
 <!-- - Portfolio: https://<your-portfolio> -->
 
 If you find this project useful: ⭐ star it, 🍴 fork it, 🐛 report issues, or 💡 suggest features — it helps.
